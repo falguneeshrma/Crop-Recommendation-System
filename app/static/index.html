@@ -137,13 +137,14 @@
     .stat-sub { font-size: 10px; color: #D1DEC7; margin-top: 2px; }
 
     .how-compact {
-      display: flex; flex-direction: column; gap: 8px; margin-top: 18px; padding: 12px 16px;
+      display: grid; grid-template-columns: 28px auto 1fr; gap: 10px 12px; margin-top: 18px; padding: 12px 16px;
       background: rgba(14,28,17,0.65); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px;
-      backdrop-filter: blur(12px); font-size: 11px; color: rgba(255,255,255,0.85); width: fit-content;
-      box-shadow: 0 8px 24px -6px rgba(0,0,0,0.3);
+      backdrop-filter: blur(12px); color: rgba(255,255,255,0.85); width: fit-content;
+      box-shadow: 0 8px 24px -6px rgba(0,0,0,0.3); align-items: center;
     }
-
-    .how-item { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: rgba(255,255,255,0.9); line-height: 1; }
+    
+    .how-label { color:#FFF; font-weight:600; font-size: 13.5px; white-space: nowrap; }
+    .how-desc { font-size: 13.5px; color: rgba(255,255,255,0.9); line-height: 1.2; }
 
     .how-index {
       font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--harvest-wheat);
@@ -348,7 +349,7 @@
           <em>for the right reasons.</em>
         </h1>
 
-        <p class="hero-description">Calibrated against real soil chemistry and regional weather patterns. Transform your parcel's raw N-P-K readings into deterministic, peer-verified crop directives — zero guesswork, guaranteed yield clarity.</p>
+        <p class="hero-description">Good crop decisions start with knowing what your soil can support. Krishi Sahayak looks at your soil and climate conditions, recommends a suitable crop, and shows you why.</p>
 
         <div class="hero-actions">
           <button type="button" class="btn-primary-action" id="heroStartBtn">
@@ -380,18 +381,17 @@
 
         <!-- How it Works Compact Ribbon -->
         <div class="how-compact">
-          <div class="how-item">
-            <span class="how-index">01</span>
-            <span><strong style="color:#FFF;font-weight:600;">Tell us:</strong> soil &amp; climate readings</span>
-          </div>
-          <div class="how-item">
-            <span class="how-index">02</span>
-            <span><strong style="color:#FFF;font-weight:600;">Predict:</strong> ML recommends best crop</span>
-          </div>
-          <div class="how-item">
-            <span class="how-index">03</span>
-            <span><strong style="color:#FFF;font-weight:600;">Explain:</strong> agronomic knowledge base</span>
-          </div>
+          <span class="how-index">01</span>
+          <strong class="how-label">Tell us:</strong>
+          <span class="how-desc">soil &amp; climate readings</span>
+          
+          <span class="how-index">02</span>
+          <strong class="how-label">Predict:</strong>
+          <span class="how-desc">ML recommends the best crop</span>
+          
+          <span class="how-index">03</span>
+          <strong class="how-label">Explain:</strong>
+          <span class="how-desc">agronomic knowledge base</span>
         </div>
       </section>
 
