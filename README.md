@@ -419,26 +419,6 @@ Once running, access the web interface by navigating to `http://localhost:8000` 
   ```
   *(Note: `crop` is an optional field)*
 
-## Example Request
-
-```bash
-curl -X POST http://localhost:8000/predict-and-explain \
-     -H "Content-Type: application/json" \
-     -d '{
-           "N": 90,
-           "P": 42,
-           "K": 43,
-           "temperature": 24.5,
-           "humidity": 82,
-           "ph": 6.5,
-           "rainfall": 220
-         }'
-```
-
-## Screenshots
-
-*(Placeholder for future screenshots of the interactive UI, assessment tab, and Ask AI tab.)*
-
 ## Limitations
 
 - **External Dependency**: Generating explanations and answering follow-up questions requires a valid internet connection and an active Groq API key.
@@ -451,4 +431,3 @@ curl -X POST http://localhost:8000/predict-and-explain \
 - [Planned] Swap the Decision Tree for Random Forest or XGBoost to improve accuracy on edge cases.
 - [Planned] Add chat memory (session state) so the AI assistant can remember previous questions and contextualize follow-ups naturally.
 - [Planned] Containerize the application using Docker for easier deployment.
->>>>>>> ec49318 (Improve crop recommendations and AI explanations)
