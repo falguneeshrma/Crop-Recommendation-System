@@ -1,12 +1,3 @@
-# 🌾 Smart Crop Recommendation System
-
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)
-![Machine Learning](https://img.shields.io/badge/ML-Scikit--Learn%20%7C%20LightGBM-orange.svg)
-![Accuracy](https://img.shields.io/badge/Accuracy-99.00%25-brightgreen.svg)
-![Domain](https://img.shields.io/badge/Domain-Precision%20Agriculture-green.svg)
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-
-An end-to-end Machine Learning based **Crop Recommendation System** designed to assist farmers and agricultural scientists in making data-driven decisions. By analyzing key soil nutrient levels (**Nitrogen, Phosphorus, Potassium**) alongside environmental conditions (**Temperature, Humidity, pH, and Rainfall**), the system predicts the most suitable crop to cultivate for maximum agricultural yield.
 
 ---
 
@@ -239,3 +230,225 @@ print(f"🌾 Recommended Crop: {predicted_crop[0].capitalize()}")
 ## 📜 License
 
 Distributed under the MIT License. See `LICENSE` for more details.
+=======
+# Krishi Sahayak
+
+AI-powered crop recommendation and agricultural advisory system that combines soil and climate data with machine learning and AI-powered explanations.
+
+## Project Overview
+
+Krishi Sahayak (Agricultural Assistant) is an intelligent decision-support system for farmers and agronomists. It solves the "black box" problem of traditional machine learning recommendations by not only predicting the most suitable crop for a given parcel of land, but also explaining *why* that crop was chosen using grounded agricultural data. Users input their local soil chemistry and climate conditions, and the system provides a data-driven recommendation alongside an interactive AI assistant for follow-up questions.
+
+## Key Features
+
+- **AI-assisted crop recommendation**: Predicts the best crop from 22 modeled varieties.
+- **Soil and climate based prediction**: Uses 7 specific environmental inputs (N, P, K, Temperature, Humidity, pH, Rainfall).
+- **Model confidence**: Displays the prediction probability of the underlying ML model.
+- **Numeric explanation of crop suitability**: Compares user inputs directly against known optimal numeric ranges for the predicted crop.
+- **Agricultural AI assistant**: A built-in chat interface to ask follow-up questions about fertilizers, irrigation, and pests, grounded in agricultural documentation.
+- **FastAPI backend**: A fast, asynchronous backend serving both the API and the web interface.
+- **Interactive web interface**: A clean, responsive, single-page application built with HTML, CSS, and JavaScript.
+
+## System Architecture
+
+```mermaid
+flowchart TD
+    A[User via Browser] -->|Inputs NPK/Climate Data| B[Frontend HTML/JS]
+    B -->|POST /predict-and-explain| C[FastAPI Backend]
+    C -->|Feature Vector| D[Decision Tree Classifier]
+    D -->|Predicted Crop| E[Crop Recommendation]
+    E -->|Crop Name| F[FAISS Vector Store]
+    F -->|Retrieves Grounded Data| G[Groq LLM RAG Chain]
+    G -->|Compares User Inputs to Optimal Ranges| H[Data-Driven Explanation]
+    H --> B
+```
+
+## Tech Stack
+
+**Frontend:**
+- HTML5
+- CSS3 (Vanilla)
+- JavaScript (Vanilla)
+
+**Backend:**
+- Python 3
+- FastAPI
+- Uvicorn (ASGI server)
+
+**Machine Learning & Data:**
+- scikit-learn (DecisionTreeClassifier)
+- pandas
+- joblib
+
+**AI & Natural Language:**
+- LangChain
+- Groq (LLM Inference - `openai/gpt-oss-120b` via Groq)
+- FAISS (Vector Store)
+- HuggingFace Embeddings (`all-MiniLM-L6-v2`)
+
+## Project Structure
+
+```text
+Krishi-Sahayak/
+├── app/
+│   ├── main.py                  # FastAPI application entry point
+│   └── static/
+│       ├── index.html           # Main web interface
+│       ├── script.js            # Frontend logic
+│       └── style.css            # Frontend styling
+├── data/
+│   ├── build_knowledge_base.py  # Script to generate markdown knowledge base
+│   ├── crop_stats.json          # Numeric boundary thresholds for crops
+│   └── knowledge_base/          # Markdown files for RAG context
+├── models/
+│   ├── crop_model.joblib        # Trained scikit-learn model
+│   └── metadata.json            # Model metadata
+├── vectorstore/
+│   └── faiss_index/             # Pre-built FAISS vector database
+├── .env                         # Local environment variables (do not commit)
+├── .gitignore
+├── ingest.py                    # Script to build FAISS index from knowledge base
+├── rag_chain.py                 # Core logic for LangChain RAG and comparisons
+├── README.md                    # Project documentation
+├── requirements.txt             # Python dependencies
+└── train_model.py               # Script to retrain the ML model
+```
+
+## Installation
+
+1. **Clone the repository**
+   ```powershell
+   git clone <repository-url>
+   cd Krishi-Sahayak
+   ```
+
+2. **Create a virtual environment**
+   ```powershell
+   python -m venv .venv
+   ```
+
+3. **Activate the virtual environment**
+   ```powershell
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+4. **Install dependencies**
+   ```powershell
+   pip install -r requirements.txt
+   ```
+
+## Environment Variables
+
+The system requires a Groq API key for the AI assistant and explanation generation to function.
+
+1. Create a `.env` file in the root of the project.
+2. Add your Groq API key:
+   ```env
+   GROQ_API_KEY=your_groq_api_key_here
+   ```
+
+> [!WARNING]
+> Ensure your `.env` file is never committed to version control. It is already included in `.gitignore`.
+
+## Running the Application
+
+Start the FastAPI application using `uvicorn`:
+
+```powershell
+uvicorn app.main:app --reload --port 8000
+```
+
+Once running, access the web interface by navigating to `http://localhost:8000` in your browser. The frontend is served directly by the FastAPI app.
+
+## API Endpoints
+
+### `GET /health`
+- **Purpose**: Check if the API is running.
+- **Request Body**: None
+- **Response**: `{"status": "ok"}`
+
+### `POST /predict`
+- **Purpose**: Get a raw crop prediction based on soil and climate conditions.
+- **Request Body**:
+  ```json
+  {
+    "N": 90,
+    "P": 42,
+    "K": 43,
+    "temperature": 24.5,
+    "humidity": 82,
+    "ph": 6.5,
+    "rainfall": 220
+  }
+  ```
+- **Response Structure**:
+  ```json
+  {
+    "crop": "rice",
+    "confidence": 1.0
+  }
+  ```
+
+### `POST /predict-and-explain`
+- **Purpose**: Get a crop prediction alongside an AI-generated explanation that strictly compares the user's input values against the crop's ideal thresholds.
+- **Request Body**: Same as `/predict`
+- **Response Structure**:
+  ```json
+  {
+    "crop": "rice",
+    "confidence": 1.0,
+    "explanation": "Why this crop?\n\nPredicted crop: Rice\n\nYour conditions compared with Rice's requirements:..."
+  }
+  ```
+
+### `POST /ask`
+- **Purpose**: Chat with the agricultural assistant regarding irrigation, fertilizers, pests, etc.
+- **Request Body**:
+  ```json
+  {
+    "question": "How often should I irrigate this crop?",
+    "crop": "rice"
+  }
+  ```
+- **Response Structure**:
+  ```json
+  {
+    "answer": "...",
+    "sources": ["rice"]
+  }
+  ```
+  *(Note: `crop` is an optional field)*
+
+## Example Request
+
+```bash
+curl -X POST http://localhost:8000/predict-and-explain \
+     -H "Content-Type: application/json" \
+     -d '{
+           "N": 90,
+           "P": 42,
+           "K": 43,
+           "temperature": 24.5,
+           "humidity": 82,
+           "ph": 6.5,
+           "rainfall": 220
+         }'
+```
+
+## Screenshots
+
+*(Placeholder for future screenshots of the interactive UI, assessment tab, and Ask AI tab.)*
+
+## Limitations
+
+- **External Dependency**: Generating explanations and answering follow-up questions requires a valid internet connection and an active Groq API key.
+- **Static Dataset Context**: The knowledge base is currently built from static markdown files and local numeric threshold ranges.
+- **Predictive Model**: The current ML model is a basic Decision Tree Classifier. While highly interpretable, it may not generalize to unseen edge cases perfectly.
+- **Decision Support Only**: This system should be treated as a decision-support tool. Final agricultural decisions should always consider ground truth and professional agronomist advice.
+
+## Future Improvements
+
+- [Planned] Swap the Decision Tree for Random Forest or XGBoost to improve accuracy on edge cases.
+- [Planned] Add chat memory (session state) so the AI assistant can remember previous questions and contextualize follow-ups naturally.
+- [Planned] Containerize the application using Docker for easier deployment.
+>>>>>>> ec49318 (Improve crop recommendations and AI explanations)

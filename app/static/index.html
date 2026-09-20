@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krishi Sahayak — Intelligent Agricultural Advisory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    :root {
+      --primary: #2F7D32;
+      --primary-hover: #256628;
+      --primary-dark: #163819;
+      --leaf: #65A30D;
+      --bg-cream: #F7F6F0;
+      --harvest-wheat: #C4973B;
+      --ink-primary: #172419;
+      --ink-secondary: #586659;
+      --ink-muted: #849285;
+      --border-subtle: #E2DFD2;
+      --font-serif: "Newsreader", Georgia, serif;
+      --font-sans: "Inter", -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden;
+      background: var(--bg-cream); color: var(--ink-primary); font-family: var(--font-sans);
+    }
+
+    .topnav {
+      height: 62px; padding: 0 44px; display: flex; align-items: center; justify-content: space-between;
+      background: #FFFFFF; border-bottom: 1px solid var(--border-subtle); position: relative; z-index: 100;
+    }
+
+    .brand-wrapper { display: flex; align-items: center; gap: 11px; text-decoration: none; cursor: pointer; }
+
+    .brand-symbol {
+      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      background: #EEF5ED; border: 1px solid #D6E4D4; border-radius: 8px; color: var(--primary);
+    }
+
+    .wordmark { font-family: var(--font-serif); font-size: 21px; font-weight: 600; color: #122915; line-height: 1.1; }
+    .tagline { font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--leaf); }
+    .navlinks { display: flex; align-items: center; gap: 24px; }
+
+    .nav-btn {
+      background: none; border: none; padding: 6px 12px; font-family: var(--font-sans);
+      font-size: 13.5px; font-weight: 500; color: var(--ink-secondary); border-radius: 6px; cursor: pointer; transition: all 0.2s;
+    }
+
+    .nav-btn:hover { color: var(--ink-primary); background: #F4F3ED; }
+    .nav-btn.active { color: var(--primary); background: #EEF5ED; font-weight: 600; }
+
+    #statusPill {
+      display: inline-flex; align-items: center; gap: 7px; padding: 4px 12px; background: #F8F9F7;
+      border: 1px solid #E1E6DF; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-secondary);
+    }
+
+    #statusDot { width: 7px; height: 7px; border-radius: 50%; background: #b7b299; transition: all 0.3s; }
+    #statusDot.ok { background: #2F7D32; box-shadow: 0 0 0 3px rgba(47, 125, 50, 0.2); animation: pulse-dot 2.5s infinite; }
+    #statusDot.bad { background: #D32F2F; box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.2); }
+
+    @keyframes pulse-dot {
+      0%   { box-shadow: 0 0 0 0   rgba(47, 125, 50, 0.4); }
+      70%  { box-shadow: 0 0 0 6px rgba(47, 125, 50, 0);   }
+      100% { box-shadow: 0 0 0 0   rgba(47, 125, 50, 0);   }
+    }
+
+    .viewport-app { position: relative; width: 100%; height: calc(100vh - 62px); display: flex; overflow: hidden; }
+    .hero-stage { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; object-position: center 36%; filter: brightness(0.92) contrast(1.04); }
+
+    .hero-scrim {
+      position: absolute; inset: 0;
+      background: linear-gradient(98deg, rgba(12,24,14,0.90) 0%, rgba(15,30,18,0.80) 42%, rgba(16,32,19,0.56) 70%, rgba(12,24,15,0.80) 100%);
+    }
+
+    .app-container {
+      position: relative; z-index: 10; width: 100%; max-width: 1440px; margin: 0 auto;
+      padding: 24px 48px; display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 36px; height: 100%; align-items: center;
+    }
+
+    .hero-editorial { display: flex; flex-direction: column; max-width: 580px; color: #FFFFFF; }
+
+    .eyebrow-badge {
+      display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22); padding: 5px 12px; border-radius: 999px;
+      font-size: 11.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #F7F6F0;
+      margin-bottom: 16px; backdrop-filter: blur(10px); width: fit-content;
+    }
+
+    .hero-headline {
+      font-family: var(--font-serif); font-size: 48px; line-height: 1.08; letter-spacing: -0.025em;
+      font-weight: 500; margin: 0 0 14px 0; color: #FFFFFF; text-shadow: 0 2px 14px rgba(0,0,0,0.35);
+    }
+
+    .hero-headline em { font-style: italic; color: #E4EEDC; font-weight: 400; }
+
+    .hero-description {
+      font-size: 15.5px; line-height: 1.58; color: rgba(247, 246, 240, 0.88); margin: 0 0 24px 0; max-width: 48ch;
+    }
+
+    .hero-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+
+    .btn-primary-action {
+      background: #2F7D32; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.16); font-family: var(--font-sans);
+      font-size: 14px; font-weight: 600; padding: 12px 22px; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px -4px rgba(24,75,27,0.5);
+      text-decoration: none; transition: all 0.2s;
+    }
+
+    .btn-primary-action:hover { background: #256628; transform: translateY(-1px); }
+
+    .btn-secondary-action {
+      background: rgba(255,255,255,0.12); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.25);
+      font-family: var(--font-sans); font-size: 14px; font-weight: 500; padding: 12px 20px; border-radius: 8px;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 8px; backdrop-filter: blur(8px);
+      text-decoration: none; transition: all 0.2s;
+    }
+
+    .btn-secondary-action:hover { background: rgba(255,255,255,0.2); }
+
+    .hero-metadata {
+      display: grid; grid-template-columns: repeat(3, auto); gap: 24px; padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .stat-num { font-family: var(--font-mono); font-size: 21px; font-weight: 600; color: #FFFFFF; line-height: 1.1; }
+    .stat-num span { color: var(--harvest-wheat); font-size: 13px; font-weight: 400; margin-left: 2px; }
+    .stat-label { font-size: 11.5px; color: rgba(247, 246, 240, 0.75); margin-top: 3px; }
+    .stat-sub { font-size: 10px; color: #D1DEC7; margin-top: 2px; }
+
+    .how-compact {
+      display: flex; flex-direction: column; gap: 8px; margin-top: 18px; padding: 12px 16px;
+      background: rgba(14,28,17,0.65); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px;
+      backdrop-filter: blur(12px); font-size: 11px; color: rgba(255,255,255,0.85); width: fit-content;
+      box-shadow: 0 8px 24px -6px rgba(0,0,0,0.3);
+    }
+
+    .how-item { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: rgba(255,255,255,0.9); line-height: 1; }
+
+    .how-index {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--harvest-wheat);
+      background: rgba(196,151,59,0.16); border: 1px solid rgba(196,151,59,0.35);
+      padding: 3px 7px; border-radius: 5px; letter-spacing: 0.04em; min-width: 28px;
+      text-align: center; display: inline-flex; justify-content: center; align-items: center;
+    }
+
+    /* Workspace Dock */
+    .workspace-dock {
+      width: 100%; max-width: 530px; justify-self: end; background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.9); border-radius: 14px;
+      box-shadow: 0 20px 48px -12px rgba(16,36,18,0.32), 0 1px 3px rgba(0,0,0,0.06);
+      overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 100px);
+    }
+
+    .workspace-header {
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 18px;
+      background: #FAF9F6; border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .workspace-tabs { display: flex; gap: 4px; background: #ECE9DD; padding: 3px; border-radius: 7px; }
+
+    .tab-btn {
+      background: transparent; border: none; padding: 5px 13px; font-family: var(--font-sans);
+      font-size: 12px; font-weight: 500; color: var(--ink-secondary); border-radius: 5px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: all 0.15s;
+    }
+
+    .tab-btn.active { background: #FFFFFF; color: var(--primary-dark); font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .workspace-badge { font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); display: flex; align-items: center; gap: 5px; }
+    .tab-content-area { padding: 18px 20px; overflow-y: auto; max-height: calc(100vh - 162px); }
+    .panel-view { display: none; }
+    .panel-view.active { display: block; animation: viewFade 0.22s ease forwards; }
+
+    @keyframes viewFade {
+      from { opacity: 0; transform: translateY(3px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+
+    .panel-title { font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: #122915; margin: 0 0 2px 0; }
+    .panel-subtitle { font-size: 12.5px; color: var(--ink-secondary); margin: 0 0 14px 0; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+    .field { display: flex; flex-direction: column; gap: 3px; }
+    .field.span-2 { grid-column: span 2; }
+    .field-label-group { display: flex; justify-content: space-between; align-items: baseline; }
+    .field-label { font-size: 11.5px; font-weight: 500; color: #2D3B2E; }
+    .field-unit { font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); }
+
+    .input-container input {
+      width: 100%; font-family: var(--font-mono); font-size: 13px; font-weight: 500; padding: 7px 10px;
+      background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--ink-primary);
+      transition: all 0.18s;
+    }
+
+    .input-container input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2.5px rgba(47,125,50,0.12); }
+    .input-container input::placeholder { color: #B5BEB6; font-weight: 400; }
+
+    .form-actions-bar { display: flex; align-items: center; gap: 9px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #ECE7DB; }
+
+    #predictBtn {
+      flex: 1; background: #2F7D32; color: #FFFFFF; border: none; font-family: var(--font-sans);
+      font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 6px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      box-shadow: 0 4px 10px rgba(47,125,50,0.22); transition: all 0.2s;
+    }
+
+    #predictBtn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    #predictBtn:disabled { background: #9DB49F; cursor: wait; transform: none; }
+
+    #fillSampleBtn {
+      background: #F3F1E7; color: #2C482F; border: 1px solid var(--border-subtle); font-family: var(--font-sans);
+      font-size: 12px; font-weight: 500; padding: 9px 12px; border-radius: 6px; cursor: pointer;
+      white-space: nowrap; transition: all 0.18s;
+    }
+
+    #fillSampleBtn:hover { background: #E7E3D3; border-color: #CEC8B5; }
+
+    /* Result area */
+    .result-card-area { margin-top: 14px; background: #FAF9F4; border: 1px solid #E5E1D2; border-radius: 9px; padding: 14px; max-height: calc(100vh - 460px); overflow-y: auto; }
+    .result-empty { display: flex; align-items: center; gap: 10px; color: var(--ink-secondary); font-size: 12px; line-height: 1.45; }
+    .result-empty-icon { width: 30px; height: 30px; border-radius: 50%; background: #ECE8DB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #4A634A; }
+    .hidden { display: none !important; }
+    .result-body { animation: viewFade 0.3s ease; }
+    .crop-badge-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .crop-label-text { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--leaf); font-weight: 600; }
+    .crop-tag { font-family: var(--font-mono); font-size: 10px; background: rgba(101,163,13,0.12); color: #355E05; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+    #cropName { font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: #122915; text-transform: capitalize; margin: 0 0 10px 0; line-height: 1.1; }
+    .confidence-box { background: #FFFFFF; border: 1px solid #E4E0D2; border-radius: 7px; padding: 9px 11px; margin-bottom: 12px; }
+    .confidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .confidence-title { font-size: 11px; font-weight: 500; color: var(--ink-secondary); }
+    #confidenceLabel { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #2F7D32; }
+    .confidence-track { width: 100%; height: 6px; background: #ECE9DF; border-radius: 999px; overflow: hidden; }
+    #confidenceFill { height: 100%; background: linear-gradient(90deg, #65A30D 0%, #2F7D32 65%, #C4973B 100%); border-radius: 999px; width: 0%; transition: width 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .explanation-header { font-size: 11.5px; font-weight: 600; letter-spacing: 0.03em; color: #1A301D; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+    #explanationText { font-size: 12.5px; line-height: 1.5; color: #273528; padding-right: 4px; }
+    #explanationText p { margin: 0 0 6px 0; }
+    #explanationText strong { color: #122915; font-weight: 600; }
+    #explanationText ul { margin: 4px 0 6px; padding-left: 16px; }
+    #resultError { margin-top: 10px; color: #A83232; font-size: 12px; background: #FDF2F2; border: 1px solid #F3CECE; padding: 8px 10px; border-radius: 6px; }
+
+    /* Chat view */
+    .ask-workspace { display: flex; flex-direction: column; }
+    .chat-suggestions { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+
+    .suggest-chip {
+      background: #F3F1E7; border: 1px solid #E2DFD3; color: #2D3D2F; font-size: 11px;
+      padding: 3px 9px; border-radius: 999px; cursor: pointer; transition: all 0.15s;
+    }
+
+    .suggest-chip:hover { background: #E7E3D3; color: var(--primary); }
+
+    .chat-log-box {
+      background: #FAF9F5; border: 1px solid #E6E3D6; border-radius: 8px; padding: 12px;
+      display: flex; flex-direction: column; gap: 10px; height: 260px; overflow-y: auto; margin-bottom: 10px;
+    }
+
+    /* The hint inside #chatLog — used by script.js via .chat-hint-msg selector */
+    .chat-hint-msg { font-size: 12px; color: var(--ink-muted); font-style: italic; text-align: center; margin: auto 0; }
+
+    .bubble { padding: 9px 12px; border-radius: 7px; font-size: 12.5px; line-height: 1.48; max-width: 86%; animation: viewFade 0.2s ease; }
+    .bubble.user { align-self: flex-end; background: #2F7D32; color: #FFFFFF; border-bottom-right-radius: 2px; }
+    .bubble.bot { align-self: flex-start; background: #FFFFFF; border: 1px solid #E2DED2; color: #1E2B20; border-bottom-left-radius: 2px; }
+    .bubble.bot .sources { margin-top: 6px; display: flex; gap: 5px; flex-wrap: wrap; }
+    .bubble.bot .src-tag { font-family: var(--font-mono); font-size: 9.5px; background: #F4EBD8; color: #725211; padding: 2px 5px; border-radius: 3px; }
+
+    .ask-form-row { display: flex; gap: 7px; align-items: center; }
+
+    #cropScope { width: 95px; flex-shrink: 0; font-family: var(--font-sans); font-size: 12px; padding: 8px 9px; background: #F4F2E8; border: 1px solid var(--border-subtle); border-radius: 6px; color: #2D3D2F; transition: all 0.18s; }
+    #cropScope:focus { outline: none; border-color: var(--primary); background: #FFFFFF; }
+
+    #questionInput { flex: 1; font-family: var(--font-sans); font-size: 12.5px; padding: 8px 10px; background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--ink-primary); transition: all 0.18s; }
+    #questionInput:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(47,125,50,0.12); }
+
+    #askBtn { background: #2F7D32; color: #FFFFFF; border: none; font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    #askBtn:hover { background: var(--primary-hover); }
+    #askBtn:disabled { background: #A1B8A3; cursor: wait; }
+
+    /* Scrollbar refinement */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #D8D4C5; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #BAB4A2; }
+  </style>
+</head>
+
+<body>
+
+  <!-- 1. Minimal White Header -->
+  <header class="topnav">
+    <a href="#" class="brand-wrapper" aria-label="Krishi Sahayak Home">
+      <div class="brand-symbol">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z" stroke-opacity="0.25"></path>
+          <path d="M12 22V10"></path>
+          <path d="M12 10C12 5 7 4 7 4s0 5 5 6z" fill="#65A30D" fill-opacity="0.35"></path>
+          <path d="M12 14c4-1 6-4 6-7 0 0-4 0-6 7z" fill="#2F7D32" fill-opacity="0.35"></path>
+          <circle cx="12" cy="6" r="1.5" fill="#C4973B" stroke="none"></circle>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="wordmark">Krishi Sahayak</div>
+        <div class="tagline">AI Crop Advisor</div>
+      </div>
+    </a>
+
+    <nav class="navlinks">
+      <button type="button" class="nav-btn active" id="navAssessmentBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        Assessment
+      </button>
+      <button type="button" class="nav-btn" id="navAskBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Ask AI
+      </button>
+      <div id="statusPill">
+        <span id="statusDot"></span>
+        <span id="statusText">checking…</span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- 2. Single-Page Viewport Application -->
+  <main class="viewport-app">
+    <!-- Cinematic Agricultural Backdrop Layer -->
+    <div class="hero-stage">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8P6DPTLbqaTPlnLuMSMUfjPgj_0piPHrIi0M7a5E9utfpwkJNpQfU8veyIwbEDt4NVVbcQ1cvByi9I8CofJcZ2pRJo4wrYnsHI9vR8m4SV2Hw-1AGDvv_NI1V1IwgdFEKo4xrtFWF_HBoSi8KBA2roeHuMSNf8XQR3WANJR71Ci-R9zUG0spfVwZBSQ09W4h2VJNOgVtDwDurlFCyq1Z4skibeiZ-d-a2v-516n54EifqDZBXbkUe"
+        alt="Wide panoramic agricultural farmland at dawn" class="hero-img">
+      <div class="hero-scrim"></div>
+    </div>
+
+    <div class="app-container">
+      <!-- Left Column: Hero Editorial Typography -->
+      <section class="hero-editorial" aria-label="Krishi Sahayak Advisory Platform">
+        <div class="eyebrow-badge">
+          <span style="color: var(--harvest-wheat);">✦</span>
+          <span>2026 Agronomic Decision Engine</span>
+        </div>
+
+        <h1 class="hero-headline">
+          Grow the right crop,<br>
+          <em>for the right reasons.</em>
+        </h1>
+
+        <p class="hero-description">Calibrated against real soil chemistry and regional weather patterns. Transform your parcel's raw N-P-K readings into deterministic, peer-verified crop directives — zero guesswork, guaranteed yield clarity.</p>
+
+        <div class="hero-actions">
+          <button type="button" class="btn-primary-action" id="heroStartBtn">
+            <span>Start Assessment</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+          <button type="button" class="btn-secondary-action" id="heroAskBtn">
+            <span>Ask AI</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+
+        <!-- Product Stats -->
+        <div class="hero-metadata">
+          <div class="stat-item">
+            <div class="stat-num">22<span>crops</span></div>
+            <div class="stat-label">Crops Modeled</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">7<span>variables</span></div>
+            <div class="stat-label">Soil &amp; Climate Readings</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">0<span>guesses</span></div>
+            <div class="stat-label">Unexplained Guesses</div>
+            <div class="stat-sub">Grounded in agricultural knowledge</div>
+          </div>
+        </div>
+
+        <!-- How it Works Compact Ribbon -->
+        <div class="how-compact">
+          <div class="how-item">
+            <span class="how-index">01</span>
+            <span><strong style="color:#FFF;font-weight:600;">Tell us:</strong> soil &amp; climate readings</span>
+          </div>
+          <div class="how-item">
+            <span class="how-index">02</span>
+            <span><strong style="color:#FFF;font-weight:600;">Predict:</strong> ML recommends best crop</span>
+          </div>
+          <div class="how-item">
+            <span class="how-index">03</span>
+            <span><strong style="color:#FFF;font-weight:600;">Explain:</strong> agronomic knowledge base</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Workspace Dock -->
+      <aside class="workspace-dock" aria-label="Advisory Workspace">
+        <div class="workspace-header">
+          <div class="workspace-tabs" role="tablist">
+            <button type="button" class="tab-btn active" id="tabAssessment" role="tab" aria-selected="true" aria-controls="viewAssessment">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M9 9h6v6H9z"></path></svg>
+              Crop Assessment
+            </button>
+            <button type="button" class="tab-btn" id="tabAsk" role="tab" aria-selected="false" aria-controls="viewAsk">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              Ask Assistant
+            </button>
+          </div>
+        </div>
+
+        <div class="tab-content-area">
+          <!-- Tab 1: Assessment View -->
+          <div class="panel-view active" id="viewAssessment" role="tabpanel">
+            <div class="panel-intro">
+              <h2 class="panel-title">Find the right crop</h2>
+              <p class="panel-subtitle">Enter your soil and climate conditions.</p>
+            </div>
+
+            <form id="predictForm">
+              <div class="field-grid">
+                <label class="field">
+                  <div class="field-label-group">
+                    <span class="field-label">Nitrogen (N)</span>
+                    <span class="field-unit">kg/ha</span>
+                  </div>
+                  <div class="input-container">
+                    <input type="number" step="any" name="N" placeholder="90" required>
+                  </div>
+                </label>
+                <label class="field">
+                  <div class="field-label-group">
+                    <span class="field-label">Phosphorus (P)</span>
+                    <span class="field-unit">kg/ha</span>
+                  </div>
+                  <div class="input-container">
+                    <input type="number" step="any" name="P" placeholder="42" required>
+                  </div>
+                </label>
+                <label class="field">
+                  <div class="field-label-group">
+                    <span class="field-label">Potassium (K)</span>
+                    <span class="field-unit">kg/ha</span>
+                  </div>
+                  <div class="input-container">
+                    <input type="number" step="any" name="K" placeholder="43" required>
+                  </div>
+                </label>
+                <label class="field">
+                  <div class="field-label-group">
+                    <span class="field-label">Temperature</span>
+                    <span class="field-unit">°C</span>
+                  </div>
+                  <div class="input-container">
+                    <input type="number" step="any" name="temperature" placeholder="24.5" required>
+                  </div>
+                </label>
+                <label class="field">
+                  <div class="field-label-group">
+                    <span class="field-label">Humidity</span>
+                    <span class="field-unit">%</span>
+                  </div>
+                  <div class="input-container">
+                    <input type="number" step="any" name="humidity" placeholder="82" required>
+                  </div>
+                </label>
+                <label class="field">
+                  <div class="field-label-group">
+                    <span class="field-label">Soil pH</span>
+                    <span class="field-unit">0–14</span>
+                  </div>
+                  <div class="input-container">
+                    <input type="number" step="any" name="ph" placeholder="6.5" required>
+                  </div>
+                </label>
+                <label class="field span-2">
+                  <div class="field-label-group">
+                    <span class="field-label">Rainfall</span>
+                    <span class="field-unit">mm</span>
+                  </div>
+                  <div class="input-container">
+                    <input type="number" step="any" name="rainfall" placeholder="220" required>
+                  </div>
+                </label>
+              </div>
+
+              <div class="form-actions-bar">
+                <button type="submit" id="predictBtn">
+                  <span id="predictBtnLabel">Get Recommendation</span>
+                  <svg id="predictBtnIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+                <button type="button" id="fillSampleBtn">Fill Sample Values</button>
+              </div>
+            </form>
+
+            <!-- AI Recommendation Result Interface -->
+            <div class="result-card-area" id="resultCard">
+              <div class="result-empty" id="resultEmpty">
+                <div class="result-empty-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </div>
+                <div>Your recommendation will appear here — crop, confidence, and a short explanation grounded in the knowledge base.</div>
+              </div>
+
+              <div class="result-body hidden" id="resultBody">
+                <div class="crop-badge-row">
+                  <span class="crop-label-text">Recommended Crop</span>
+                  <span class="crop-tag">Optimal Match</span>
+                </div>
+                <h3 id="cropName">—</h3>
+
+                <div class="confidence-box">
+                  <div class="confidence-header">
+                    <span class="confidence-title">Model Confidence</span>
+                    <span id="confidenceLabel">0%</span>
+                  </div>
+                  <div class="confidence-track">
+                    <div id="confidenceFill"></div>
+                  </div>
+                </div>
+
+                <div class="explanation-header">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2F7D32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                  <span>Why this crop?</span>
+                </div>
+                <div id="explanationText"></div>
+              </div>
+
+              <div id="resultError" class="hidden"></div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Ask AI View -->
+          <div class="panel-view" id="viewAsk" role="tabpanel">
+            <div class="ask-workspace">
+              <div class="panel-intro">
+                <h2 class="panel-title">Ask AI Assistant</h2>
+                <p class="panel-subtitle">Grounded agronomic guidance on irrigation, fertilizers, &amp; pests.</p>
+              </div>
+
+              <div class="chat-suggestions" id="chatSuggestions">
+                <button type="button" class="suggest-chip" data-q="How much fertilizer should I use?">Fertilizer dosage?</button>
+                <button type="button" class="suggest-chip" data-q="How often should I irrigate?">Irrigation frequency?</button>
+                <button type="button" class="suggest-chip" data-q="What pests should I watch for?">Common pests?</button>
+                <button type="button" class="suggest-chip" data-q="Why was this crop recommended?">Why recommended?</button>
+              </div>
+
+              <div class="chat-log-box" id="chatLog">
+                <div class="chat-hint-msg" id="chatHint">
+                  Ask anything about planting schedules, soil amendments, or crop defense.
+                </div>
+              </div>
+
+              <form id="askForm" class="ask-form-row">
+                <input type="text" id="cropScope" placeholder="crop (opt)" title="Scope to a specific crop">
+                <input type="text" id="questionInput" placeholder="Ask agricultural question…" required>
+                <button type="submit" id="askBtn">Send</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="/static/script.js"></script>
+  <script>
+    // UI Tab Switching & Viewport Orchestration
+    document.addEventListener("DOMContentLoaded", () => {
+      const tabAssessment   = document.getElementById("tabAssessment");
+      const tabAsk          = document.getElementById("tabAsk");
+      const viewAssessment  = document.getElementById("viewAssessment");
+      const viewAsk         = document.getElementById("viewAsk");
+      const navAssessmentBtn = document.getElementById("navAssessmentBtn");
+      const navAskBtn       = document.getElementById("navAskBtn");
+      const heroStartBtn    = document.getElementById("heroStartBtn");
+      const heroAskBtn      = document.getElementById("heroAskBtn");
+
+      function switchTab(target) {
+        const toAssessment = target === "assessment";
+        tabAssessment.classList.toggle("active", toAssessment);
+        tabAssessment.setAttribute("aria-selected", String(toAssessment));
+        tabAsk.classList.toggle("active", !toAssessment);
+        tabAsk.setAttribute("aria-selected", String(!toAssessment));
+        viewAssessment.classList.toggle("active", toAssessment);
+        viewAsk.classList.toggle("active", !toAssessment);
+        navAssessmentBtn.classList.toggle("active", toAssessment);
+        navAskBtn.classList.toggle("active", !toAssessment);
+      }
+
+      tabAssessment?.addEventListener("click",  () => switchTab("assessment"));
+      navAssessmentBtn?.addEventListener("click", () => switchTab("assessment"));
+      heroStartBtn?.addEventListener("click",   () => switchTab("assessment"));
+      tabAsk?.addEventListener("click",         () => switchTab("ask"));
+      navAskBtn?.addEventListener("click",      () => switchTab("ask"));
+      heroAskBtn?.addEventListener("click",     () => switchTab("ask"));
+
+      // Quick-fill question chips
+      document.querySelectorAll(".suggest-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const q = chip.getAttribute("data-q");
+          const qi = document.getElementById("questionInput");
+          if (qi && q) { qi.value = q; qi.focus(); }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

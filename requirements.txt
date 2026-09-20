@@ -1,0 +1,20 @@
+# Core ML (crop prediction)
+pandas
+scikit-learn
+joblib
+
+# RAG stack
+langchain
+langchain-community
+langchain-groq
+langchain-huggingface
+langchain-text-splitters
+sentence-transformers
+faiss-cpu
+
+# API
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+python-dotenv
