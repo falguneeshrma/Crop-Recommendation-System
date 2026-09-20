@@ -8,11 +8,7 @@
 - [Dataset Overview](#-dataset-overview)
 - [Project Workflow](#-project-workflow)
 - [Machine Learning Models & Performance](#-machine-learning-models--performance)
-- [Directory Structure](#-directory-structure)
 - [Installation & Setup](#-installation--setup)
-- [Usage & Sample Prediction](#-usage--sample-prediction)
-- [Future Roadmap](#-future-roadmap)
-- [License](#-license)
 
 ---
 
@@ -150,18 +146,6 @@ Both evaluated models achieved high precision and recall on the test dataset:
 
 ---
 
-## 📁 Directory Structure
-
-```
-Crop management system/
-│
-├── Crop_recommendation.csv         # Complete dataset (2200 rows, 8 columns)
-├── CropRecommendationSystemm.ipynb # Jupyter Notebook with EDA, visualizations & ML training
-└── README.md                       # Comprehensive project documentation & architecture
-```
-
----
-
 ## ⚡ Installation & Setup
 
 ### 1. Prerequisites
@@ -182,55 +166,6 @@ pip install pandas numpy matplotlib seaborn plotly scikit-learn lightgbm jupyter
 
 ---
 
-## 💡 Usage & Sample Prediction
-
-### Running via Jupyter Notebook
-Launch the notebook to inspect interactive visualizations and run model evaluations:
-
-```bash
-jupyter notebook CropRecommendationSystemm.ipynb
-```
-
-### Python Code Snippet for Single Sample Prediction
-
-```python
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-
-# 1. Load dataset
-data = pd.read_csv('Crop_recommendation.csv')
-X = data[['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']]
-y = data['label']
-
-# 2. Train Model
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0, shuffle=True)
-clf = DecisionTreeClassifier(criterion='entropy', random_state=0)
-clf.fit(X_train, y_train)
-
-# 3. Custom Input Prediction: [N, P, K, temp, humidity, pH, rainfall]
-sample_input = [[119, 44, 15, 22.14, 82.85, 7.09, 60.65]]
-predicted_crop = clf.predict(sample_input)
-
-print(f"🌾 Recommended Crop: {predicted_crop[0].capitalize()}")
-# Output: 🌾 Recommended Crop: Cotton
-```
-
----
-
-## 🚀 Future Roadmap
-
-- [ ] **Web Application Integration:** Build an interactive frontend using Flask / Streamlit for real-time farmer inputs.
-- [ ] **IoT Sensor Integration:** Connect real-time soil moisture, NPK sensors, and weather APIs.
-- [ ] **Fertilizer Recommendation:** Extend prediction engine to recommend optimal fertilizer dosage based on nutrient deficits.
-- [ ] **REST API Deployment:** Package the model into Docker container and serve predictions via FastAPI.
-
----
-
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more details.
-=======
 # Krishi Sahayak
 
 AI-powered crop recommendation and agricultural advisory system that combines soil and climate data with machine learning and AI-powered explanations.
